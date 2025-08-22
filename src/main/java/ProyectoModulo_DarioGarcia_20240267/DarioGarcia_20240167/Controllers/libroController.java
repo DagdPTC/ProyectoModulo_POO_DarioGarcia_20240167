@@ -1,14 +1,18 @@
 package ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Controllers;
 
 import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.DTO.libroDTO;
+import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Exceptions.ExcepcionDatosDuplicados;
+import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Exceptions.ExcepcionLibroNoEncontrado;
 import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Services.libroService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,5 +53,30 @@ public class libroController {
         }
     }
 
-    @PutMapping("/editarLibro")
+    @PutMapping("/editarLibro/{id}")
+    public ResponseEntity<?> modificarLibro(
+            @PathVariable Long id,
+            @Valid @RequestBody libroDTO json,
+            BindingResult bindingResult
+    ){
+        if (bindingResult.hasErrors()){
+            Map<String, String> errores = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errores);
+        }
+
+        try{
+            //Se crea el objeto tipo DTO y se invoca al metodo actualizarLibro que está en el service
+            libroDTO dto = service.actualizarLibro(id, json);
+            //La api retorna una respuesta la cual contendrá los datos en formato DTO
+            return ResponseEntity.ok(dto);
+        }catch (ExcepcionLibroNoEncontrado e){
+            return ResponseEntity.notFound().build();
+        }catch (ExcepcionDatosDuplicados e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                    "Error", "Datos duplicados",
+                    "Campo", e.getCa
+            ))
+        }
+    }
 }
