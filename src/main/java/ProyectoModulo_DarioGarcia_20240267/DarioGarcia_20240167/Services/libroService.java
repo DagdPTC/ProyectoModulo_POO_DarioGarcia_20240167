@@ -2,6 +2,7 @@ package ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Services;
 
 import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.DTO.libroDTO;
 import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Entities.libroEntity;
+import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Exceptions.ExcepcionLibroNoRegistrado;
 import ProyectoModulo_DarioGarcia_20240267.DarioGarcia_20240167.Repositories.libroRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,35 @@ public class libroService {
                 .collect((Collectors.toList()));
     }
 
-    private libroDTO convertirADTO(libroEntity libroEntity) {
+    public libroDTO insertarDatos(libroDTO data) {
+        if (data == null || data.getTitulo() == null
+                || data.getIsbn() == null ||
+                data.getGenero() == null){
+            throw new IllegalArgumentException("Los campos no pueden ser nulos");
+        }
+        try{
+            libroEntity entity = ConvertirAEntity(data);
+            libroEntity libroGuardado = repo.save(entity);
+            return convertirADTO(libroGuardado);
+        }catch (Exception e){
+            log.error("Error al registrar el libro: " + e.getMessage());
+            throw new ExcepcionLibroNoRegistrado("Error al registrar el libro");
+        }
     }
 
-    public libroDTO insertarDatos(@Valid libroDTO json) {
+    private libroEntity ConvertirAEntity(libroDTO data) {
+        libroEntity entity = new libroEntity();
+        entity.setTitulo(data.getTitulo());
+        entity.setIsbn(data.getIsbn());
+        entity.setAño_publicacion(data.getAño_publicacion());
+        entity.setGenero(data.getGenero());
+        return entity;
+    }
+
+    private libroDTO convertirADTO(libroEntity libroEntity) {
+        //Creando el objeto a retornar
+        libroDTO dto = new libroDTO();
+        //Transferir los datos del entity al dto
+        dto.setId(libroEntity.getId());
     }
 }
