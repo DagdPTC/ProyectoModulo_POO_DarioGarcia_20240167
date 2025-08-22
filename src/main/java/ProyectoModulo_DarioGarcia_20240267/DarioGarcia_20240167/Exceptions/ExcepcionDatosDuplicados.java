@@ -11,5 +11,4 @@ public class ExcepcionDatosDuplicados extends RuntimeException {
         this.campoDuplicado = campoDuplicado;
     }
 
-    public ExcepcionDatosDuplicados(String campoDuplicado){this.campoDuplicado;}
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +76,33 @@ public class libroController {
         }catch (ExcepcionDatosDuplicados e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
                     "Error", "Datos duplicados",
-                    "Campo", e.getCa
-            ))
+                    "Campo", e.getCampoDuplicado())
+            );
+        }
+    }
+
+    @DeleteMapping("/eliminarRegistro/{id}")
+    public ResponseEntity<?> eliminarLibro(@PathVariable Long id){
+        try {
+            if (!service.removerLibro(id)){
+                //Error
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Mensaje error", "Libro no encontrado")
+                        .body(Map.of(
+                                "Error", "Not Found",
+                                "Mensaje", "El libro no ha sido encontrado",
+                                "timestamp", Instant.now().toString()
+                        ));
+            }
+            return ResponseEntity.ok().body(Map.of(
+                    "status", "Proceso completado",
+                    "message", "Libro eliminado exitosamente"
+            ));
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(Map.of(
+               "status", "Error",
+               "message", "Error al eliminar el usuario",
+               "detail", e.getMessage()
+            ));
         }
     }
 }
