@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name= "LIBROS")
+@Table(name= "BOOKS")
 @Getter @Setter @ToString @EqualsAndHashCode
 public class libroEntity {
 
@@ -23,7 +23,7 @@ public class libroEntity {
     @Column(name = "ISBN")
     private String isbn;
 
-    @Column(name = "AÑO_PUBLICACION")
+    @Column(name = "ANIO_PUBLICACION")
     private int año_publicacion;
 
     @Column(name = "GENERO")
